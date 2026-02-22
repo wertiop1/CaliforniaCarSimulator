@@ -1,7 +1,3 @@
-// TrafficCar.cs
-// Attach to every enemy car prefab.
-// The spawner sets CarType and PlayerSpeedRef before the car activates.
-
 using UnityEngine;
 
 public enum CarType { Faster, Slower }
@@ -11,22 +7,20 @@ public class TrafficCar : MonoBehaviour
 {
     [Header("Identity")]
     public CarType carType = CarType.Faster;
-    public Sprite[] sprites;           // Drag your car sprites here in the prefab
+    public Sprite[] sprites;           
 
     [Header("Speed Offsets (relative to player speed)")]
     [Tooltip("How much FASTER than the player this car goes (Faster type)")]
-    public float overtakeOffset = 3f;  // e.g. player=10 → this car=13
+    public float overtakeOffset = 3f;  
 
     [Tooltip("How much SLOWER than the player this car goes (Slower type)")]
-    public float blockerOffset  = 3f;  // e.g. player=10 → this car=7
+    public float blockerOffset  = 3f;  
 
     [Header("Despawn")]
     [Tooltip("Destroy when this many units behind the camera's bottom edge")]
     public float despawnBehindDistance = 5f;
     [Tooltip("Destroy when this many units ahead of the camera's top edge")]
     public float despawnAheadDistance  = 5f;
-
-    // Set by the spawner every frame so cars always know the current player speed
     [HideInInspector] public float playerSpeed;
 
     private SpriteRenderer sr;
@@ -53,7 +47,6 @@ public class TrafficCar : MonoBehaviour
             ? playerSpeed + overtakeOffset
             : Mathf.Max(0f, playerSpeed - blockerOffset);
 
-        // Cars drive upward (positive Y) — flip if your road runs along X
         transform.Translate(Vector2.up * speed * Time.deltaTime, Space.World);
     }
 
