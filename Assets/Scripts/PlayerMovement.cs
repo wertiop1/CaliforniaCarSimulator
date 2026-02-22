@@ -11,10 +11,10 @@ public class PlayerMovement : MonoBehaviour, ISpeedProvider
     public float currentSpeed;
     public float CurrentSpeed => currentSpeed;
 
-    [Header("Lane Check")]
-    public Transform laneCheck;
-    public float laneCheckRadius = 0.2f;
-    public LayerMask laneLayer;
+    [Header("Car Check")]
+    public Transform carCheck;
+    public float carCheckRadius = 0.2f;
+    public LayerMask carLayer;
     
     private Rigidbody2D rb;
     private float moveInput;
@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour, ISpeedProvider
     private float blinker;
 
     private bool isBreaking;
+    private bool collisionCar;
     
     void Start()
     {
@@ -35,7 +36,8 @@ public class PlayerMovement : MonoBehaviour, ISpeedProvider
     }
 
     void Update()
-    {   
+    {
+        collisionCar = Physics2D.OverlapCircle(carCheck.position,carCheckRadius, carLayer);
         moveInput = Keyboard.current.wKey.isPressed ? 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
         turnInput = Keyboard.current.aKey.isPressed ? 1f : Keyboard.current.dKey.isPressed ? -1f : 0f;
 
@@ -51,6 +53,14 @@ public class PlayerMovement : MonoBehaviour, ISpeedProvider
             isBreaking = true;
         } else {
             isBreaking = false;
+        }
+
+        if (collisionCar) {
+                    Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
     }
 

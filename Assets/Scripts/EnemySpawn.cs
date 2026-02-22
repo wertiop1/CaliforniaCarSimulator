@@ -86,7 +86,7 @@ public class TrafficSpawner : MonoBehaviour
         float spawnX  = LaneConfig.GetLaneX(lane);
 
         GameObject prefab = carPrefabs[Random.Range(0, carPrefabs.Length)];
-        GameObject go     = Instantiate(prefab, new Vector3(spawnX, spawnY, 0f), Quaternion.identity);
+        GameObject go     = Instantiate(prefab, new Vector3(spawnX, spawnY, -0.1f), Quaternion.identity);
 
         TrafficCar car = go.GetComponent<TrafficCar>();
         if (car == null)
