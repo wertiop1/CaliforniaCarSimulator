@@ -4,11 +4,10 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Speed")]
-    public float acceleration = 2f;
-    public float breakSpeed = 4f;
-
-    [Header("Gas")]
-    //public float gas = 100f;
+    public float acceleration = 50f;
+    public float turnSpeed = 20f;
+    public float breakSpeed = 50f;
+    public float speedLimit = 10f;
 
     [Header("Lane Check")]
     public Transform laneCheck;
@@ -17,14 +16,13 @@ public class PlayerMovement : MonoBehaviour
     
     private Rigidbody2D rb;
     private float moveInput;
+    private float turnInput;
     private bool passedLane;
 
     private float blinker;
 
     private bool isBreaking;
     
-    
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,14 +30,12 @@ public class PlayerMovement : MonoBehaviour
         rb.mass = 0.2f;
         blinker = 0f;
         isBreaking = false;
-        
     }
 
     void Update()
     {   
-        //passedLane = Physics2D.OverlapCircle(laneCheck.position, laneCheckRadius, laneLayer);
         moveInput = Keyboard.current.wKey.isPressed ? 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
-        if (moveInput != 0f) 
+        turnInput = Keyboard.current.aKey.isPressed ? 1f : Keyboard.current.dKey.isPressed ? -1f : 0f;
 
         if (Keyboard.current.qKey.isPressed) {
             Debug.Log("Left Blinker");
@@ -54,19 +50,31 @@ public class PlayerMovement : MonoBehaviour
         } else {
             isBreaking = false;
         }
-
-
-
     }
 
     void FixedUpdate()
-    {
+    {   
+        // Rotate the car
+        transform.Rotate(0f, 0f, turnInput * turnSpeed * Time.deltaTime);
+
+        // Accelerate along the car's forward direction
         rb.AddForce(transform.up * acceleration * moveInput * Time.deltaTime);
+
+        // Brake
         if (isBreaking && rb.linearVelocity.magnitude > 0.1f) {
-            rb.AddForce(rb.linearVelocity.normalized * -1 * Time.deltaTime * breakSpeed);
+            rb.AddForce(rb.linearVelocity.normalized * -breakSpeed * Time.deltaTime);
         } else if (isBreaking) {
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
+        }
+
+        // Align velocity with car rotation (so it always goes forward)
+        if (rb.linearVelocity.magnitude > 0.01f) {
+            if(rb.linearVelocity.magnitude > 10)
+            {
+                rb.linearVelocity = speedLimit * (Vector2)transform.up;
+            }
+            else rb.linearVelocity = rb.linearVelocity.magnitude * (Vector2)transform.up;
         }
     }
 }
